@@ -1,6 +1,0 @@
-  
-/- GeForce_GTX_1660_Super :
-| link          	 https://www.ebay.com/dsc/i.html?_from=R40&_sacat=0&LH_TitleDesc=1&_udlo=&_udhi=&LH_BIN=1&LH_ItemCondition=4&_ftrt=901&_ftrv=1&_sabdlo=&_sabdhi=&_samilow=&_samihi=&_sadis=15&_stpos=24201&_sop=12&_dmd=1&_ipg=50&_fosrp=1&_nkw=GeForce+GTX+1660+Super&_ex_kw=parts+non+not&_in_kw=1
-| average cost 		 $1526
-| average $/day		 $3.32 
-| average ROI		 ~459 days 
