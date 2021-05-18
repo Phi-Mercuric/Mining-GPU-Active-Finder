@@ -16,8 +16,7 @@ find_all_gpu_costs()
 	       string=`echo $string| sed 's/.$//'`
 	fi
 	
-	site=`echo 'https://www.ebay.com/dsc/i.html?_from=R40&_sacat=0&LH_TitleDesc=1&_udlo=&_udhi=&LH_BIN=1&LH_ItemCondition=4&_ftrt=901&_ftrv=1&_sabdlo=&_sabdhi=&_samilow=&_samihi=&_sadis=15&_stpos=24201&_sop=12&_dmd=1&_ipg=50&_fosrp=1&_nkw='$string'&_ex_kw=parts+non+not&_in_kw=1'`
-	
+	site=`echo 'https://www.ebay.com/sch/i.html?_from=R40&_nkw='$string'+-fits+-for+-cover&_in_kw=1&_ex_kw=&_sacat=0&_udlo=&_udhi=&LH_BIN=1&_ftrt=901&_ftrv=1&_sabdlo=&_sabdhi=&_samilow=&_samihi=&_sadis=15&_stpos=24201&_sargn=-1%26saslc%3D1&_salic=1&_sop=12&_dmd=1&_ipg=200&_fosrp=1'`	
 
 	avCost=0
 	
