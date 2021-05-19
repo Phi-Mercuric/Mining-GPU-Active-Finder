@@ -70,15 +70,9 @@ done
 
 wait
 
-#sorting by price (I know, I know: it is a lot of string manipulation that isn't compressed or simplified)
+echo Best_GPUs.txt
 
-rois=`cat Best_GPUs.txt| grep "ROI"| sort -u| tr -s "\n" "_"`
-lines=`echo $rois| tr -dc '_'| wc -c`
-
-for (( roiIt=1; roiIt<=$lines; roiIt++ )); do
-	s=`echo $rois| cut -d "_" -f $roiIt| tr -dc "0-9"`
-	cat Best_GPUs.txt| grep -B 5 "~$s days"
-done
+rm Best_GPUs.txt
 
 }
 
