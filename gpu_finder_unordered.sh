@@ -35,6 +35,11 @@ find_all_gpu_costs()
 	done
 		
 	locprof=`echo $prof| cut -d " " -f $temp`
+
+	while [[ "${locprof:0:1}" == "0" ]]; do
+	      locprof=${locprof:1}
+      	done	      
+
 	roi=$(( ( $avCost * 100 ) / $locprof ))
 
 
