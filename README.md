@@ -11,6 +11,8 @@
 		<li> Shows days to ROI, profit per day, and average cost of the card </li>
 	</ul>
 <br>
+<p><b>Note: At this moment, this does in incorperate EBAY shipping costs.</b></p>
+<br>
 <h3>Drawbacks:</h3> 
 <p>
 	There will be somewhat more risk from buying from EBAY and if you are a big man with big farms, there is only a certain amount that you can buy from ebay without increasing risk or cost. <br> <br>
