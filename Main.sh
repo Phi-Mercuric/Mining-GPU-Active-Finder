@@ -48,7 +48,7 @@ find_all_gpu_costs()
 		fi
 		if [[ "$cost" -gt "$costBotThreshold" ]]; then
 			if [[ $(( avCost * 9 / 10 )) -gt $cost ]]; then
-				good_deals+="$cost:$(( $cost * 100 / $locprof )), "
+				good_deals+="\$$cost:$(( $cost * 100 / $locprof ))d, "
 			fi
 		fi
 		gpuAmt=$(( $gpuAmt + 1 ))
@@ -108,6 +108,8 @@ gpu_ordered()
 			s=`echo $rois| cut -d "_" -f $roiIt| tr -dc "0-9"`
 			cat Best_GPUs.txt| grep -B 5 -A 1 "~$s days"
 		done
+
+		echo -e "\n\nHint: deal format is <price>:<roi in days>"
 		
 		rm Best_GPUs.txt
 		
@@ -148,7 +150,7 @@ gpu_unordered()
 		
 		wait
 		
-		echo Best_GPUs.txt
+		cat Best_GPUs.txt
 		
 		rm Best_GPUs.txt
 		
@@ -157,6 +159,37 @@ gpu_unordered()
 	
 	main
 }
+
+
+database_update() 
+{ 
+	createFoler=true
+	for folder in `ls ~/`; do
+		if [[ $folder == "price_archive" ]]; then
+			createFolder=false
+			break
+		fi
+	done
+
+	if [[ "$createFolder" == "true" ]]; then
+		mkdir ~/price_archive
+		mkdir ~/price_archive/history
+		mkdir ~/price_archive/history/cleaned
+	fi
+
+	startT=`date +"%T"| tr -d ":"`
+	
+	file=`date +"%d-%m-%y-%T"| cut --complement -d ":" -f 3`
+	
+	
+	touch ~/price_archive/history/$file
+
+	gpu_unordered > ~/price_archive/history/$file
+
+	endT=`date +"%T"| tr -d ":"`
+	
+	echo "finished in `expr $endT - $startT` seconds"
+}
 	
 while getopts ":udo" opt; do
 	case $opt in
@@ -164,7 +197,7 @@ while getopts ":udo" opt; do
 			echo "starting unordered GPU finder"; gpu_unordered
 			;;
 		d)
-			echo "coming soon"
+			echo "updating database"; database_update
 			;;
 		o)
 			echo "starting ordered GPU finder"; gpu_ordered
