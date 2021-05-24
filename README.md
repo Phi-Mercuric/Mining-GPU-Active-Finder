@@ -1,4 +1,4 @@
-# Active-Best-Mining-Graphics-Card-Finder
+# Mining-GPU-Active-Finder
 <p>
 	Bash script that indexes gpu profitability sites and compares them to the average price the graphics cards go for on ebay <br> <br>
 	Mining profitability changes rapidly and unexpectedly with advent of new coins and changing prices, and that profitability changes from GPU to GPU, and the <i>REAL</i> prices (the prices that you can actually get for cards, not unobtainable MSRP) of those GPUs change day to day. This makes it very hard to keep on top of the latest trends and what cards are the best for the money you put in. <br> <br>
