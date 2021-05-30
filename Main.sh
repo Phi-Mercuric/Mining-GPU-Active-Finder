@@ -171,15 +171,15 @@ gpu_unordered()
 
 database_update() 
 { 
-	createFoler=true
+	_bool=true
 	for folder in `ls ~/`; do
 		if [[ $folder == "price_archive" ]]; then
-			createFolder=false
+			_bool=false
 			break
 		fi
 	done
 
-	if [[ "$createFolder" == "true" ]]; then
+	if [[ "$_bool" == "true" ]]; then
 		mkdir ~/price_archive
 		mkdir ~/price_archive/history
 		mkdir ~/price_archive/history/cleaned
