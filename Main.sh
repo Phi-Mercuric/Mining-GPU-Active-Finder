@@ -3,6 +3,8 @@
 find_all_gpu_costs() 
 {
 
+# preparing
+
 	gpu=$1
 	string=`echo $gpu| tr -s "_" "+"`
 
@@ -16,6 +18,8 @@ find_all_gpu_costs()
 	avCost=0
 	
 	gpuAmt=0
+
+# site things
 
 	echo `curl -s $site| grep -A 1 '<span  class="bold">'| grep '/span'| tr -d '</span>		$'| cut -d "." -f 1| tr -d ","` >> "$gpu-costs.txt"
 
@@ -32,15 +36,19 @@ find_all_gpu_costs()
 		gpuAmt=$(( $gpuAmt + 1 ))
 	done
 
-	gpuAmt=0
+
 		
 	locprof=`echo $prof| cut -d " " -f $temp`
 	
 	while [[ "${locprof:0:1}" == "0" ]]; do
 		locprof=${locprof:1}
 	done
+
+# calculations and stuff 
 	
 	good_deals=""
+	gpuAmt=0
+
 	for cost in `cat "$gpu-costs.txt"`; do
 		cost=`echo $cost| tr -d 'qwertyuiopasdfghjklzxcvbnmQWERTYUIOPASDFGHJKLZXCVBNM"='`
 		if [[ "$gpuAmt" == "0" ]]; then
