@@ -14,18 +14,18 @@ find_all_gpu_costs()
 	
 	site=`echo 'https://www.ebay.com/dsc/i.html?_from=R40&_sacat=0&LH_TitleDesc=1&_udlo=&_udhi=&LH_BIN=1&LH_ItemCondition=4&_ftrt=901&_ftrv=1&_sabdlo=&_sabdhi=&_samilow=&_samihi=&_sadis=15&_stpos=24201&_sop=12&_dmd=1&_ipg=25&_fosrp=1&_nkw="'$string'"&_ex_kw=parts+non+not&_in_kw=1'`
 	
-
-	avCost=0
-	
-	gpuAmt=0
-
 # site things
-
+	
+	# this is due to some odd erros when using variables whose root causes illuded base debugging. Fix this.
 	echo `curl -s $site| grep -A 1 '<span  class="bold">'| grep '/span'| tr -d '</span>		$'| cut -d "." -f 1| tr -d ","` >> "$gpu-costs.txt"
 
+	# Finding average cost
+	declare -i avCost
+	declare -i gpuAmt
 	for cost in `cat "$gpu-costs.txt"`; do
+		# try to incorperate ASCII module thing instead of this & put in prev curl line thing ( not on linux rn )
 		cost=`echo $cost| tr -d 'qwertyuiopasdfghjklzxcvbnmQWERTYUIOPASDFGHJKLZXCVBNM"='`
-		if [[ "$gpuAmt" == "0" ]]; then
+		if [[ "$gpuAmt" == "0" ]]; then		
 			costBotThreshold=$(( $cost / 3 ))
 		fi
 		if [[ "$cost" -gt "$costBotThreshold" ]]; then
@@ -37,18 +37,19 @@ find_all_gpu_costs()
 	done
 
 
-		
-	locprof=`echo $prof| cut -d " " -f $temp`
+	# calculations and stuff 		
 	
+	# getting corresponding profits
+	locprof=`echo $prof| cut -d " " -f $temp` 
+	
+	# cutting off leading 0s to prevent error (I.E. 5 / 02.78 )
 	while [[ "${locprof:0:1}" == "0" ]]; do
 		locprof=${locprof:1}
 	done
-
-# calculations and stuff 
 	
+	# finding good deals
 	good_deals=""
 	gpuAmt=0
-
 	for cost in `cat "$gpu-costs.txt"`; do
 		cost=`echo $cost| tr -d 'qwertyuiopasdfghjklzxcvbnmQWERTYUIOPASDFGHJKLZXCVBNM"='`
 		if [[ "$gpuAmt" == "0" ]]; then
@@ -61,7 +62,7 @@ find_all_gpu_costs()
 		fi
 		gpuAmt=$(( $gpuAmt + 1 ))
 	done
-
+	
 	rm -r "$gpu-costs.txt"
 
 	roi=$(( ( $avCost * 100 ) / $locprof ))
