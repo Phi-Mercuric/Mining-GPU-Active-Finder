@@ -132,6 +132,7 @@ gpu_ordered()
 
 gpu_unordered()
 {
+	# now alphabetical for database purposes
 
 	gpus=" "
 	prof=" "
@@ -164,8 +165,6 @@ gpu_unordered()
 		rois=`cat Best_GPUs.txt| grep "/-"|sort -u|tr -d ': /-'| tr -s "\n" "|"`
 		lines=`echo $rois| tr -dc '|'| wc -c`
 		
-		echo $rois
-
 		for (( roiIt=1; roiIt<=$lines; roiIt++ )); do
 			s=`echo $rois| cut -d "|" -f $roiIt`
 			cat Best_GPUs.txt| grep -A 6 "/- $s "
