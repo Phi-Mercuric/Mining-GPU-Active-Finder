@@ -131,14 +131,14 @@ gpu_ordered()
 
 gpu_unordered()
 {
-	
+
 	gpus=" "
 	prof=" "
 	output=""
 	
 	main () 
 	{
-		
+
 		echo "Starting..."
 		
 		echo " " > Best_GPUs.txt
@@ -158,14 +158,24 @@ gpu_unordered()
 		
 		wait
 		
-		cat Best_GPUs.txt
+		#sorting by price
 		
+		rois=`cat Best_GPUs.txt| grep "/-"|sort -u|tr -d ': /-'| tr -s "\n" "|"`
+		lines=`echo $rois| tr -dc '|'| wc -c`
+		
+		echo $rois
+
+		for (( roiIt=1; roiIt<=$lines; roiIt++ )); do
+			s=`echo $rois| cut -d "|" -f $roiIt`
+			cat Best_GPUs.txt| grep -A 6 "/- $s "
+		done
+
 		rm Best_GPUs.txt
 		
 	}
 	
-	
 	main
+	
 }
 
 
@@ -187,7 +197,7 @@ database_update()
 
 	startT=`date +"%T"| tr -d ":"`
 	
-	file=`date +"%d-%m-%y-%T"| cut --complement -d ":" -f 3`
+	file=`date +"%y-%m-%d-%T"| cut --complement -d ":" -f 3`
 	
 	
 	touch ~/price_archive/history/$file
