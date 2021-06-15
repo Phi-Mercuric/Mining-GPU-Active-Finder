@@ -13,11 +13,11 @@ find_all_gpu_costs()
 	fi
 	
 	site=`echo 'https://www.ebay.com/sch/i.html?_from=R40&_trksid=p2334524.m570.l1313&_nkw='$string'+-parts+-non+-not+-box+-chip&_sacat=0&LH_TitleDesc=1&_ftrt=901&_ipg=25&LH_ItemCondition=1000%7C1500%7C2000%7C2500%7C3000&_dmd=1&_stpos=24201&LH_BIN=1&_odkw=+-parts+-non+-not+-box+-chip&_osacat=0&_sop=12&_ftrv=1&_sadis=15'`
-	
+
 # site things
 	
 	# this is due to some odd erros when using variables whose root causes illuded base debugging. Fix this.
-	echo `curl -s $site| grep -A 1 '<span  class="bold">'| grep '/span'| tr -d '</span>		$'| cut -d "." -f 1| tr -d ","` >> "$gpu-costs.txt"
+	curl -s $site|tr -s "<>" "\n"|grep 'span class=s-item__price' -A 1| grep -v 'span' | tr -d '$,-' | grep '.' | cut -d '.' -f '1' > $gpu-costs.txt
 
 	# Finding average cost
 	avCost=0
@@ -63,7 +63,7 @@ find_all_gpu_costs()
 		gpuAmt=$(( $gpuAmt + 1 ))
 	done
 	
-	rm -r "$gpu-costs.txt"
+	#rm "$gpu-costs.txt"
 
 	roi=$(( ( $avCost * 100 ) / $locprof ))
 	
