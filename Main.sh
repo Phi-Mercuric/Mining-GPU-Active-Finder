@@ -6,6 +6,7 @@ find_all_gpu_costs()
 # preparing
 
 	gpu=$1
+	temp=$2
 	string=`echo $gpu| tr -s "_" "+"`
 
 	if [[ ${gpu: -1} == '+' ]]; then
@@ -41,7 +42,9 @@ find_all_gpu_costs()
 	
 	# getting corresponding profits
 	locprof=`echo $prof| cut -d " " -f $temp` 
-	
+
+	echo "$prof| cut -d \" \" -f $temp"
+
 	# cutting off leading 0s to prevent error (I.E. 5 / 02.78 )
 	while [[ "${locprof:0:1}" == "0" ]]; do
 		locprof=${locprof:1}
@@ -95,7 +98,7 @@ gpu_ordered()
 		
 		gpus=`curl -s 'https://whattomine.com/gpus'| grep -A 1 -B 1 '</td>'| grep -B 2 '<td class="text-center">'| grep '</a>'| sed 's/<\/a>//'| tr -d '(*)'| sed 's/Unrestricted//'| tr -s " " "_"`
 		
-		prof=`curl -s 'https://whattomine.com/gpus'| grep -A 1 '<td class="text-right table-success font-weight-bold">'| grep -v '<'| grep -v '-'| tr -d '.$'`
+		prof=`curl -s 'https://whattomine.com/gpus'| grep -A 1 '<td class="text-end table-">'| grep -v '<'| grep -v '-'| tr -d '.$'`
 		
 		echo ". . ."
 		
@@ -105,7 +108,7 @@ gpu_ordered()
 			temp=$(( $temp + 1 ))
 			find_all_gpu_costs $gpu $temp &
 		done
-		
+
 		wait
 		
 		#sorting by price
@@ -155,7 +158,7 @@ gpu_unordered()
 		
 		for gpu in $gpus; do
 			temp=$(( $temp + 1 ))
-			find_all_gpu_costs $gpu $temp &
+			find_all_gpu_costs $gpu $temp $prof &
 		done
 		
 		wait
