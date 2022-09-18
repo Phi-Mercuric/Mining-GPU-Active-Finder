@@ -2,11 +2,10 @@
 
 find_all_gpu_costs() 
 {
-
-# preparing
-
+	# preparing
 	gpu=$1
 	temp=$2
+	locprof=$3
 	string=`echo $gpu| tr -s "_" "+"`
 
 	if [[ ${gpu: -1} == '+' ]]; then
@@ -15,20 +14,67 @@ find_all_gpu_costs()
 	
 	site=`echo 'https://www.ebay.com/sch/i.html?_from=R40&_trksid=p2334524.m570.l1313&_nkw='$string'+-parts+-non+-not+-box+-chip&_sacat=0&LH_TitleDesc=1&_ftrt=901&_ipg=25&LH_ItemCondition=1000%7C1500%7C2000%7C2500%7C3000&_dmd=1&_stpos=24201&LH_BIN=1&_odkw=+-parts+-non+-not+-box+-chip&_osacat=0&_sop=12&_ftrv=1&_sadis=15'`
 
-# site things
+	# site things
 	
-	# this is due to some odd erros when using variables whose root causes illuded base debugging. Fix this.
+	# this is due to some odd errors when using variables whose root causes illuded base debugging. Fix this.
 	curl -s $site|tr -s "<>" "\n"|grep 'span class=s-item__price' -A 1| grep -v 'span' | tr -d '$,-' | grep '.' | cut -d '.' -f '1' > $gpu-costs.txt
-
+	
+	echo $(($(cat site_count) + 1)) > site_count
+	echo -ne "                                                        \r"
+	echo -ne "       `cat site_count`\t|\t    `cat calc_count`\t\t|\t  `cat done_count`\r"
+	
 	# Finding average cost
-	avCost=0
+	gpuAv=0
+	gpuAvTrim1=0
+	gpuAvTrim2=0
+	costBotThreshold=0
+	{ # Finding the price range that we will consider.
+
+		# Finding average cost of all costs
+		gpuAmt=0
+		for cost in `cat "$gpu-costs.txt"`; do
+			if [[ $gpuAmt != 0 ]]; then # Often first number is erronious
+				cost=`echo $cost| tr -d 'qwertyuiopasdfghjklzxcvbnmQWERTYUIOPASDFGHJKLZXCVBNM"='`
+				gpuAv=$(( ( $gpuAv * $gpuAmt + $cost ) / ( $gpuAmt + 1 ) ))
+				if [[ $temp == 5 ]]; then echo "{cost: $cost, gpuAv: $gpuAv}"; fi
+			fi
+			gpuAmt=$(( $gpuAmt + 1 ))
+		done
+
+		# Find average cost without high. High first bc 1 high outlier can bring up av infinately.
+		gpuAmt=0
+		for cost in `cat "$gpu-costs.txt"`; do
+			if [[ $gpuAmt != 0 ]]; then # Often first number is erronious
+				cost=`echo $cost| tr -d 'qwertyuiopasdfghjklzxcvbnmQWERTYUIOPASDFGHJKLZXCVBNM"='`
+				if [[ $cost -lt $(( $gpuAv * 3 / 2 )) ]]; then 
+					gpuAvTrim1=$(( ( $gpuAvTrim1 * $gpuAmt + $cost ) / ( $gpuAmt + 1 ) ))
+					if [[ $temp == 5 ]]; then echo "{cost: $cost, gpuAvTrim1: $gpuAvTrim1}"; fi
+				fi
+			fi
+			gpuAmt=$(( $gpuAmt + 1 ))
+		done
+
+		# Find average cost without low outliers.
+		gpuAmt=0
+		for cost in `cat "$gpu-costs.txt"`; do
+			if [[ $gpuAmt != 0 ]]; then # Often first number is erronious
+				cost=`echo $cost| tr -d 'qwertyuiopasdfghjklzxcvbnmQWERTYUIOPASDFGHJKLZXCVBNM"='`
+				if [[ $cost -gt $(( $gpuAvTrim1 / 2 )) && $cost -lt $(( $gpuAv * 3 / 2 )) ]]; then 	# prev eq doesn't delete high 
+					gpuAvTrim2=$(( ( $gpuAvTrim2 * $gpuAmt + $cost ) / ( $gpuAmt + 1 ) ))			# outliers, so it needs to be
+					if [[ $temp == 5 ]]; then echo "{cost: $cost, gpuAvTrim2: $gpuAvTrim2}"; fi 	# done again here
+				fi
+			fi
+			gpuAmt=$(( $gpuAmt + 1 ))
+		done
+
+		costBotThreshold=$(( $gpuAvTrim2 / 2 ))
+	}
+
 	gpuAmt=0
+	avCost=0
 	for cost in `cat "$gpu-costs.txt"`; do
 		# try to incorperate ASCII module thing instead of this & put in prev curl line thing ( not on linux rn )
 		cost=`echo $cost| tr -d 'qwertyuiopasdfghjklzxcvbnmQWERTYUIOPASDFGHJKLZXCVBNM"='`
-		if [[ "$gpuAmt" == "0" ]]; then		
-			costBotThreshold=$(( $cost / 3 ))
-		fi
 		if [[ "$cost" -gt "$costBotThreshold" ]]; then
 			if [[ "$(( $costBotThreshold * 6 ))" -gt "$cost" ]]; then
 				avCost=$(( ( $avCost * $gpuAmt + $cost ) / ( $gpuAmt + 1 ) ))
@@ -36,14 +82,9 @@ find_all_gpu_costs()
 		fi
 		gpuAmt=$(( $gpuAmt + 1 ))
 	done
-
-
-	# calculations and stuff 		
 	
-	# getting corresponding profits
-	locprof=`echo $prof| cut -d " " -f $temp` 
-
-	echo "$prof| cut -d \" \" -f $temp"
+	echo $(($(cat calc_count) + 1)) > calc_count
+	echo -ne "       `cat site_count`\t|\t    `cat calc_count`\t\t|\t  `cat done_count`\r"	
 
 	# cutting off leading 0s to prevent error (I.E. 5 / 02.78 )
 	while [[ "${locprof:0:1}" == "0" ]]; do
@@ -51,22 +92,22 @@ find_all_gpu_costs()
 	done
 	
 	# finding good deals
-	good_deals=""
-	gpuAmt=0
-	for cost in `cat "$gpu-costs.txt"`; do
-		cost=`echo $cost| tr -d 'qwertyuiopasdfghjklzxcvbnmQWERTYUIOPASDFGHJKLZXCVBNM"='`
-		if [[ "$gpuAmt" == "0" ]]; then
-			costBotThreshold=$(( $cost / 3 ))
-		fi
-		if [[ "$cost" -gt "$costBotThreshold" ]]; then
-			if [[ $(( avCost * 9 / 10 )) -gt $cost ]]; then
-				good_deals+="\$$cost:$(( $cost * 100 / $locprof ))d, "
-			fi
-		fi
-		gpuAmt=$(( $gpuAmt + 1 ))
-	done
+	#good_deals=""
+	#gpuAmt=0
+	#for cost in `cat "$gpu-costs.txt"`; do
+	#	cost=`echo $cost| tr -d 'qwertyuiopasdfghjklzxcvbnmQWERTYUIOPASDFGHJKLZXCVBNM"='`
+	#	if [[ "$gpuAmt" == "0" ]]; then
+	#		costBotThreshold=$(( $cost / 3 ))
+	#	fi
+	#	if [[ "$cost" -gt "$costBotThreshold" ]]; then
+	#		if [[ $(( avCost * 9 / 10 )) -gt $cost ]]; then
+	#			good_deals+="\$$cost:$(( $cost * 100 / $locprof ))d, "
+	#		fi
+	#	fi
+	#	gpuAmt=$(( $gpuAmt + 1 ))
+	#done
 	
-	#rm "$gpu-costs.txt"
+	rm "$gpu-costs.txt"
 
 	roi=$(( ( $avCost * 100 ) / $locprof ))
 	
@@ -74,12 +115,15 @@ find_all_gpu_costs()
 	echo "  
 /- $gpu :
 | link			 `echo $site|tr -d '"'`
+| DBG:{ ID: $temp, GA: $gpuAv, GAT1: $gpuAvTrim1, GAT2: $gpuAvTrim2, CBT:$costBotThreshold }
 | average cost		 \$$avCost
 | average $/day		 \$$(( locprof / 100 )).$(( locprof % 100 )) 
 | average ROI		 ~$roi days
 | good/fake deals	 $good_deals
 " >> Best_GPUs.txt
-
+	
+	echo $(($(cat done_count) + 1)) > done_count
+	echo -ne "       `cat site_count`\t|\t    `cat calc_count`\t\t|\t  `cat done_count`\r"
 }
 
 gpu_ordered()
@@ -87,12 +131,12 @@ gpu_ordered()
 	
 	gpus=" "
 	prof=" "
-	output=""
+	output=" "
 	
 	main () 
 	{
 
-		echo "Starting..."
+		echo "|- Getting site information"
 		
 		echo " " > Best_GPUs.txt
 		
@@ -100,19 +144,23 @@ gpu_ordered()
 		
 		prof=`curl -s 'https://whattomine.com/gpus'| grep -A 1 '<td class="text-end table-">'| grep -v '<'| grep -v '-'| tr -d '.$'`
 		
-		echo ". . ."
-		
+		echo "|--- Got site data\n|- starting GPU calculations."
+		echo "0" > site_count
+		echo "0" > calc_count
+		echo "0" > done_count
+		echo -ne "|--- Got site\t|\tCalculed\t|\tFinished\n\n";
 		temp=0
-		
 		for gpu in $gpus; do
 			temp=$(( $temp + 1 ))
-			find_all_gpu_costs $gpu $temp &
-		done
-
+			locprof=`echo $prof| cut -d " " -f $temp` 
+			find_all_gpu_costs $gpu $temp $locprof &
+		done 
 		wait
 		
+		rm site_count calc_count done_count		
+		printf -e "|--- Finsished caluclations\n|- starting output creation."
+
 		#sorting by price
-		
 		rois=`cat Best_GPUs.txt| grep "ROI"| sort -u| tr -s "\n" "_"`
 		lines=`echo $rois| tr -dc '_'| wc -c`
 		
@@ -158,7 +206,8 @@ gpu_unordered()
 		
 		for gpu in $gpus; do
 			temp=$(( $temp + 1 ))
-			find_all_gpu_costs $gpu $temp $prof &
+			locprof=`echo $prof| cut -d " " -f $temp` 
+			find_all_gpu_costs $gpu $temp $locprof &
 		done
 		
 		wait
@@ -221,8 +270,9 @@ while getopts ":udo" opt; do
 			echo "updating database"; database_update
 			;;
 		o)
-			echo "starting ordered GPU finder"; gpu_ordered
-			;;
+			echo "starting ordered GPU finder";
+			echo " ";
+			gpu_ordered;;
 		\?)
 			echo -e "-o	GPU cards orded by ROI\n-u	GPU cards unordered"
 			;;
