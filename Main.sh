@@ -36,7 +36,6 @@ find_all_gpu_costs()
 			if [[ $gpuAmt != 0 ]]; then # Often first number is erronious
 				cost=`echo $cost| tr -d 'qwertyuiopasdfghjklzxcvbnmQWERTYUIOPASDFGHJKLZXCVBNM"='`
 				gpuAv=$(( ( $gpuAv * $gpuAmt + $cost ) / ( $gpuAmt + 1 ) ))
-				if [[ $temp == 5 ]]; then echo "{cost: $cost, gpuAv: $gpuAv}"; fi
 			fi
 			gpuAmt=$(( $gpuAmt + 1 ))
 		done
@@ -48,7 +47,6 @@ find_all_gpu_costs()
 				cost=`echo $cost| tr -d 'qwertyuiopasdfghjklzxcvbnmQWERTYUIOPASDFGHJKLZXCVBNM"='`
 				if [[ $cost -lt $(( $gpuAv * 3 / 2 )) ]]; then 
 					gpuAvTrim1=$(( ( $gpuAvTrim1 * $gpuAmt + $cost ) / ( $gpuAmt + 1 ) ))
-					if [[ $temp == 5 ]]; then echo "{cost: $cost, gpuAvTrim1: $gpuAvTrim1}"; fi
 				fi
 			fi
 			gpuAmt=$(( $gpuAmt + 1 ))
@@ -61,7 +59,6 @@ find_all_gpu_costs()
 				cost=`echo $cost| tr -d 'qwertyuiopasdfghjklzxcvbnmQWERTYUIOPASDFGHJKLZXCVBNM"='`
 				if [[ $cost -gt $(( $gpuAvTrim1 / 2 )) && $cost -lt $(( $gpuAv * 3 / 2 )) ]]; then 	# prev eq doesn't delete high 
 					gpuAvTrim2=$(( ( $gpuAvTrim2 * $gpuAmt + $cost ) / ( $gpuAmt + 1 ) ))			# outliers, so it needs to be
-					if [[ $temp == 5 ]]; then echo "{cost: $cost, gpuAvTrim2: $gpuAvTrim2}"; fi 	# done again here
 				fi
 			fi
 			gpuAmt=$(( $gpuAmt + 1 ))
@@ -158,7 +155,6 @@ gpu_ordered()
 		wait
 		
 		rm site_count calc_count done_count		
-		printf -e "|--- Finsished caluclations\n|- starting output creation."
 
 		#sorting by price
 		rois=`cat Best_GPUs.txt| grep "ROI"| sort -u| tr -s "\n" "_"`
