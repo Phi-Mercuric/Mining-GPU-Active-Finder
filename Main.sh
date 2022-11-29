@@ -80,7 +80,11 @@ find_all_gpu_costs()
 	output ~/.temp/calc_count
 
 	# Outputting to file for later use
-	while [[ "${locprof:0:1}" == "0" ]]; do locprof=${locprof:1}; done								# remove leading zeros
+	if [[ ${locprof:0:1} == "-" ]]; then
+		while [[ "${locprof:1:1}" == "0" ]]; do locprof=-${locprof:2}; done
+	else
+		while [[ "${locprof:0:1}" == "0" ]]; do locprof=${locprof:1}; done								# remove leading zeros
+	fi
 	roi=$(( ( $avCost * 100 ) / $locprof ))
 	profit=""
 	if [[ $(( locprof % 100 )) -lt 10 ]]; then
@@ -176,7 +180,7 @@ database_update()
 	echo "" > ~/.temp/GPU_Info.txt						# file for outputting gpu info
 	echo "|- Getting site information"
 	gpus=`curl -s 'https://whattomine.com/gpus'| grep -A 1 -B 1 '</td>'| grep -B 2 '<td class="text-center">'| grep '</a>'| sed 's/<\/a>//'| tr -d '(*)'| sed 's/Unrestricted//'| tr -s " " "_"`
-	profitList=`curl -s 'https://whattomine.com/gpus'| grep -A 1 '<td class="text-end table-">'| grep -v '<'| grep -v '-'| tr -d '.$'`
+	profitList=`curl -s 'https://whattomine.com/gpus'| grep -A 1 '<td class="text-end table-">'| grep -v '<'| grep "[0..9]"| tr -d '.$'`
 
 	echo -e "|--- Got site data\n|- Starting GPU calculations."
 	echo -e "|--- Got site\t|\tCalculated\t|\tFinished";
