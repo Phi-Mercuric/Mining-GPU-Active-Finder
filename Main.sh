@@ -80,17 +80,21 @@ find_all_gpu_costs()
 	output ~/.temp/calc_count
 
 	# Outputting to file for later use
-	if [[ ${locprof:0:1} == "-" ]]; then
-		while [[ "${locprof:1:1}" == "0" ]]; do locprof=-${locprof:2}; done
-	else
-		while [[ "${locprof:0:1}" == "0" ]]; do locprof=${locprof:1}; done								# remove leading zeros
-	fi
-	roi=$(( ( $avCost * 100 ) / $locprof ))
 	profit=""
+	if [[ ${locprof:0:1} == "-" ]]; then 
+		profit="-"; 
+		locprof=${locprof:1}; 
+	fi
+
+	while [[ "${locprof:0:1}" == "0" ]]; do locprof=${locprof:1}; done								# remove leading zeros
+
+	if [[ ${profit:0:1} == "-" ]]; then 
+		roi=$(( ( $avCost * 100 ) / $locprof ))
+	fi
 	if [[ $(( locprof % 100 )) -lt 10 ]]; then
-		profit="$(( locprof / 100 )).0$(( locprof % 100 ))"
+		profit+="$(( locprof / 100 )).0$(( locprof % 100 ))"
 	else
-		profit="$(( locprof / 100 )).$(( locprof % 100 ))"
+		profit+="$(( locprof / 100 )).$(( locprof % 100 ))"
 	fi
 	echo "
 /- $gpu :
