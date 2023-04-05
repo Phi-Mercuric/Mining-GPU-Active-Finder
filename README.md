@@ -11,7 +11,7 @@
 		<li> Shows days to ROI, profit per day, and average cost of the card </li>
 	</ul>
 <br>
-<p><b>Note: At this moment, this does in incorperate EBAY shipping costs.</b> (although it used to, but lost the data) </p>
+<p><b>Note: At this moment, this does not incorperate EBAY shipping costs.</b> (although it used to, but lost the data) </p>
 <br>
 <h3>Drawbacks:</h3> 
 <p>
