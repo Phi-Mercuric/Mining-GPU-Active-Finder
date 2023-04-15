@@ -20,8 +20,8 @@ find_all_gpu_costs()
 	  string=`echo $string| sed 's/.$//'`
 	fi
 	## site url for search, include exceptions for parts and broken cards, then manipulate site output into '\n' delimited list
-	site=`echo 'https://www.ebay.com/sch/i.html?_from=R40&_trksid=p2334524.m570.l1313&_nkw='$string'+-parts+-non+-not+-box+-chip&_sacat=0&LH_TitleDesc=1&_ftrt=901&_ipg=25&LH_ItemCondition=1000%7C1500%7C2000%7C2500%7C3000&_dmd=1&_stpos=24201&LH_BIN=1&_odkw=+-parts+-non+-not+-box+-chip&_osacat=0&_sop=12&_ftrv=1&_sadis=15'`
-	curl -s $site|tr -s "<>" "\n"|grep 'span class=s-item__price' -A 1| grep -v 'span' | tr -d '$,-' | grep '.' | cut -d '.' -f '1' > ~/.temp/MGAF-"$gpu"-costs.txt
+	site=`echo 'https://www.ebay.com/sch/i.html?_nkw='$string'+-fan+-board+-psu+-cable+-divider+-convertor+-power'`
+	curl -s $site|tr -s "<>" "\n"|grep 'span class=s-item__price' -A 1 -B 20 | grep '!--M/--' -A 21 | grep '$[0-9]'| tr -d '$,-' | grep '.' | cut -d '.' -f '1' > ~/.temp/MGAF-"$gpu"-costs.txt
 
 	echo -ne "                                                        \r"							# reset line to reduce errors.
 	output ~/.temp/site_count
@@ -183,8 +183,8 @@ database_update()
 	mkdir ~/.temp										# folder for temp gpu prices
 	echo "" > ~/.temp/GPU_Info.txt						# file for outputting gpu info
 	echo "|- Getting site information"
-	gpus=`curl -s 'https://whattomine.com/gpus'| grep -A 1 -B 1 '</td>'| grep -B 2 '<td class="text-center">'| grep '</a>'| sed 's/<\/a>//'| tr -d '(*)'| sed 's/Unrestricted//'| tr -s " " "_"`
-	profitList=`curl -s 'https://whattomine.com/gpus'| grep -A 1 '<td class="text-end table-">'| grep -v '<'| grep "[0..9]"| tr -d '.$'`
+	gpus=`curl -s 'https://whattomine.com/miners'| grep -A 1 -B 1 '</td>'| grep -B 2 '<td class="text-center">'| grep '</a>'| sed 's/<\/a>//' | tr -d '(*)'| sed 's/Unrestricted//' | tr -s " " "_" | sed 's/^<a_href.*>//'`
+	profitList=`curl -s 'https://whattomine.com/miners'| grep '<td class="text-end table-success fw-bold">' -A 1 | grep -v '<' | grep "[0..9]"| tr -d '.$'`
 
 	echo -e "|--- Got site data\n|- Starting GPU calculations."
 	echo -e "|--- Got site\t|\tCalculated\t|\tFinished";
