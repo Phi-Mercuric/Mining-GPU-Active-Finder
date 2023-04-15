@@ -1,4 +1,0 @@
-mkdir: cannot create directory ‘/home/user/.temp’: File exists
-./Main.sh: line 37: ( 299 * 4 +  ) / ( 4 + 1 ) : syntax error: operand expected (error token is ") / ( 4 + 1 ) ")
-./Main.sh: line 37: ( 2950 * 65 +  ) / ( 65 + 1 ) : syntax error: operand expected (error token is ") / ( 65 + 1 ) ")
-./Main.sh: line 92: ( 107 * 100 ) /  : syntax error: operand expected (error token is "/  ")
